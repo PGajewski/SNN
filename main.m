@@ -53,7 +53,7 @@ ylabel('y');
 
 sum_mses = zeros(2,20);
 min_mses = ones(2,20);
-
+best_networks = cell(20,1);
 for j=1:100
     fprintf('Iteration: %d\n', j);
     for i=1:20
@@ -81,6 +81,7 @@ for j=1:100
         %Save minimal value.
         if min_mses(2,i) > test_mse
             min_mses(2,i) = test_mse;
+            best_networks{i} = net;
         end
     end
 end
@@ -88,4 +89,39 @@ end
 for i=1:20
     fprintf('Mean mse for %d neurons:\n learn: %f\n test: %f\n', i, sum_mses(1,i)/100,  sum_mses(2,i)/100);
     fprintf('Minimal mse for %d neurons:\n learn: %f\n test: %f\n', i, min_mses(1,i),  min_mses(2,i));
+end
+
+figure();
+plot(1:1:20, min_mses(1,:), 1:1:20, min_mses(2,:));
+title('Minimal mse in set of network');
+xlabel('hidden neurons');
+ylabel('mse');
+legend('train set', 'test set');
+
+figure();
+plot(1:1:20, sum_mses(1,:), 1:1:20, sum_mses(2,:));
+title('Sum of mse in set of network');
+xlabel('hidden neurons');
+ylabel('mse');
+legend('train set', 'test set');
+
+%%
+%Count leverages for best network.
+for i=1:20
+   %Count Jocobian.
+   Z = calc_jacobian(best_networks{i},trainX');
+   
+   s = size(Z);
+   if rank(Z) == s(1,2)
+   %LU factorization.
+        fprintf('Found for size: %d\n', i);
+        [U,S,V] = svd(Z);
+        leverages = zeros(1,i);
+        for k = 1 : i
+           leverages(1,k) = S(k,k); 
+        end
+        leverages
+   else
+        fprintf('Bad rand of Z matrix for network: %d\n', i);
+   end
 end

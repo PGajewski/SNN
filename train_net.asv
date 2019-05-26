@@ -37,9 +37,7 @@ function [net]= train_net(train_set,labels,hidden_neurons_count)
     net.b{2} = rand*0.3-0.15;
     
     %change subset sizes.
-    net.divideParam.trainRatio = 0.8;
-    net.divideParam.valRatio = 0.2;
-     net.divideParam.testRatio = 0;
+    net.divideParam.trainRatio = 
     
     net=train(net,train_set',labels');      %uczenie sieci
     
