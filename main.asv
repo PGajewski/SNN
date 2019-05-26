@@ -1,0 +1,69 @@
+close all;
+clear all;
+
+%Read data from file.
+fileID = fopen('A_test_2.txt','r');
+formatSpec = '%f %f';
+testData = textscan(fileID, formatSpec);
+testX = testData(1);
+testX = testX{:}';
+testY = testData(2);
+testY = testY{:}';
+fclose(fileID);
+
+fileID = fopen('A_train_2.txt','r');
+trainData = textscan(fileID, formatSpec);
+trainX = trainData(1);
+trainX = trainX{:}';
+trainY = trainData(2);
+trainY = trainY{:}';
+fclose(fileID);
+
+% Neural network - preparing.
+
+%Normalize data and centralize data.
+data_max_x = max(trainX);
+data_min_x = min(trainX);
+
+trainX = (trainX - (data_max_x + data_min_x)/2)*(2/(data_max_x-data_min_x));
+
+data_max_y = max(trainY);
+data_min_y = min(trainY);
+
+trainY = (trainY - (data_max_y + data_min_y)/2)*(2/(data_max_y-data_min_y));
+
+testX = (testX - (data_max_x + data_min_x)/2)*(2/(data_max_x-data_min_x));
+testY = (testY - (data_max_y + data_min_y)/2)*(2/(data_max_y-data_min_y));
+
+figure(1)
+scatter(testX, testY, 2);
+
+figure(2)
+scatter(trainX', trainY', 2);
+
+%% Find number of neurons.
+
+mean_mse = zeros(2,100);
+for j=1:100
+    for i=1:20
+        neuron_number=i;
+        [net]=train_net(trainX',trainY',neuron_number);
+
+        % Check loop.
+        result = sim(net, trainX);
+        train_difference = (result - trainY).^2;
+
+        result = sim(net, testX);
+        test_difference = (result - testY).^2;
+
+        train_mse = mean(train_difference);
+        test_mse = mean(test_difference);
+        fprintf('Mean error for %d neurons:\n learn: %f\n test: %f\n', i, train_mse,  test_mse);
+        mean_mse(1,i) = mean_mse(1,i) + train_mse;
+        mean_mse(2,i) = mean_mse(2,i) + test_mse;
+    end
+end
+
+for i=1:20
+    fprintf('Mean mse for %d neurons:\n learn: %f\n test: %f\n', i, mean_mse(1,i)/100,  mean_mse(2,i)/100);
+end
