@@ -21,7 +21,8 @@ function [net]= train_net(train_set,labels,hidden_neurons_count)
     net.trainParam.goal = 0.01;             %warunek stopu - poziom b³êdu
     net.trainParam.epochs = 100;            %maksymalna liczba epok
     net.trainParam.showWindow = false;      %nie pokazywaæ okna z wykresami
-                                            %w trakcie uczenia   
+                                            %w trakcie uczenia
+%% Command section for default initialization                                            
     %Change weights and biases.
     bin = zeros(1, hidden_neurons_count);
     w = zeros(1, hidden_neurons_count);
@@ -35,7 +36,7 @@ function [net]= train_net(train_set,labels,hidden_neurons_count)
     net.LW{2,1} = v;
     net.b{1} = bin';
     net.b{2} = rand*0.3-0.15;
-    
+%%    
     %change subset sizes.
     net.divideParam.trainRatio = 0.8;
     net.divideParam.valRatio = 0.2;
